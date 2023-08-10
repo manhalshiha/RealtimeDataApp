@@ -1,0 +1,19 @@
+﻿@page "/"
+
+<PageTitle>Live Date</PageTitle>
+ @foreach(var emp in EmployeesList)
+ {
+     <p>@emp.Name | @emp.Title</p>
+ }
+@code{
+    @using RealtimeDataApp.Data
+    @using RealtimeDataApp.Services
+    @inject EmployeeService employeeService
+    List<Employee> EmployeesList = new List<Employee>();
+    protected async override Task OnInitializedAsync()
+    {
+        EmployeesList = await employeeService.GetAllEmployees();
+    }
+}
+
+
