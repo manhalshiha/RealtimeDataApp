@@ -6,14 +6,28 @@
      <p>@emp.Name | @emp.Title</p>
  }
 @code{
+    @using Microsoft.AspNetCore.SignalR.Client
     @using RealtimeDataApp.Data
     @using RealtimeDataApp.Services
     @inject EmployeeService employeeService
+    @inject NavigationManager Navigation
+    private HubConnection? hubConnection;
     List<Employee> EmployeesList = new List<Employee>();
     protected async override Task OnInitializedAsync()
     {
         EmployeesList = await employeeService.GetAllEmployees();
+        hubConnection = new HubConnectionBuilder()
+        .WithUrl(Navigation.ToAbsoluteUri("/employeehub"))
+        .Build();
+
+        hubConnection.On<List<Employee>>("RefreshEmployees", employees =>
+    {
+        EmployeesList=employees;
+        InvokeAsync(StateHasChanged);
+    });
+        await hubConnection.StartAsync();
     }
+    
 }
 
 
